@@ -59,6 +59,8 @@ pub enum SubCommands {
         /// ID of the task to remove
         task_id: String,
     },
+    /// List all tags
+    Tags,
 }
 
 pub type TaskliteResult<T> = Result<T, Box<dyn Error>>;

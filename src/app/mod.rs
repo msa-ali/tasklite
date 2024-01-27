@@ -10,6 +10,7 @@ use crate::{Task, TaskliteResult};
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppData {
     pub tasks: HashMap<usize, Task>,
+    pub tags: HashMap<String, Vec<usize>>,
     pub next_id: usize,
     pub config: AppConfig,
 }
@@ -48,6 +49,7 @@ impl AppData {
             let mut file = File::create(app_data_file)?;
             let app_data = AppData {
                 tasks: HashMap::new(),
+                tags: HashMap::new(),
                 next_id: 1,
                 config: AppConfig {
                     date_format: DEFAULT_DATE_FORMAT.to_string(),
