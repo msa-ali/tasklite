@@ -1,6 +1,12 @@
 use std::error::Error;
 use clap::Parser;
 
+mod tasks;
+mod app;
+
+pub use tasks::*;
+pub use app::*;
+
 #[derive(Parser)]
 #[clap(
     name = "tasklite",
@@ -84,11 +90,8 @@ pub fn run(config: SubCommands) -> TaskliteResult<()> {
     //         tasklite::remove_task(task_id)?;
     //     }
     // }
+    let app_data = AppData::init()?;
+    println!("{:?}", app_data);
     Ok(())
-}
-
-fn parse_date(date: &str) -> TaskliteResult<chrono::NaiveDateTime> {
-    let date = chrono::NaiveDateTime::parse_from_str(date, "%d-%m-%Y %H:%M:%S")?;
-    Ok(date)
 }
 
