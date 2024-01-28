@@ -38,15 +38,12 @@ fn get_app_data_file_path() -> PathBuf {
 
 impl AppData {
     pub fn init() -> TaskliteResult<Self> {
-        println!("Initializing app data...");
         let app_directory = get_app_data_dir_path();
         if !app_directory.exists() {
-            println!("Creating directory: {:?}", app_directory);
             create_dir(app_directory)?;
         }
         let app_data_file = get_app_data_file_path();
         if !app_data_file.exists() {
-            println!("Creating file: {:?}", app_data_file);
             let mut file = File::create(app_data_file)?;
             let app_data = AppData {
                 tasks: BTreeMap::new(),
@@ -60,7 +57,6 @@ impl AppData {
             file.write_all(json.as_bytes())?;
             Ok(app_data)
         } else {
-            println!("App is already initialized..");
             let file = File::open(app_data_file)?;
             let app_data: AppData = serde_json::from_reader(file)?;
             Ok(app_data)

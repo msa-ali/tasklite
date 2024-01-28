@@ -60,7 +60,7 @@ pub enum SubCommands {
         /// ID of the task to remove
         task_id: String,
     },
-    /// List all tags
+    /// List all existing tags
     Tags,
     /// Reset the tasklist
     Reset,
@@ -74,9 +74,7 @@ pub fn get_args() -> TaskliteResult<SubCommands> {
 }
 
 pub fn run(config: SubCommands) -> TaskliteResult<()> {
-    println!("{:?}", config);
     let app_data = AppData::init()?;
-    println!("{:?}", app_data);
     let mut task_manager = task_manager::TaskManager::new(app_data);
     match config {
         SubCommands::Add {
@@ -85,7 +83,6 @@ pub fn run(config: SubCommands) -> TaskliteResult<()> {
             due_date,
             tags,
         } => {
-            println!("add task");
             task_manager.add_task(name, priority, due_date, tags)?;
         }
         SubCommands::List {
@@ -102,7 +99,12 @@ pub fn run(config: SubCommands) -> TaskliteResult<()> {
             task_manager.remove_task(parse_id(&task_id)?)?;
         }
         SubCommands::Tags => {
-            let tags = task_manager.list_tags().join(", ");
+            let tags = task_manager
+                .list_tags()
+                .join(", ")
+                .is_empty()
+                .then(|| "No tags found. Try creating tasks with tags like `tasklite add \"task name\" -t tag1,tag2` !")
+                .unwrap();
             println!("{}", tags);
         }
         SubCommands::Reset => {
@@ -113,5 +115,6 @@ pub fn run(config: SubCommands) -> TaskliteResult<()> {
 }
 
 fn parse_id(id: &str) -> TaskliteResult<usize> {
-    id.parse::<usize>().map_err(|_| format!("task with id {} not found", id).into())
+    id.parse::<usize>()
+        .map_err(|_| format!("task with id {} not found", id).into())
 }
