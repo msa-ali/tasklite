@@ -84,6 +84,8 @@ pub fn run(config: SubCommands) -> TaskliteResult<()> {
             tags,
         } => {
             task_manager.add_task(name, priority, due_date, tags)?;
+            let tasks: Vec<&Task> = task_manager.app_data.tasks.values().map(|x| x).collect::<Vec<_>>();
+            print_tasks(&tasks);
         }
         SubCommands::List {
             priority,
@@ -91,10 +93,7 @@ pub fn run(config: SubCommands) -> TaskliteResult<()> {
             tags,
         } => {
             let tasks = task_manager.filter_tasks(priority, due_before, tags)?;
-            match tasks.is_empty() {
-                true => println!("No tasks found"),
-                false => display_tasks(sort_tasks(tasks)),
-            }
+            print_tasks(&tasks);
         }
         SubCommands::Done { task_id } => {
             task_manager.mark_done(parse_id(&task_id)?)?;
@@ -103,13 +102,8 @@ pub fn run(config: SubCommands) -> TaskliteResult<()> {
             task_manager.remove_task(parse_id(&task_id)?)?;
         }
         SubCommands::Tags => {
-            let tags = task_manager
-                .list_tags()
-                .join(", ")
-                .is_empty()
-                .then(|| "No tags found. Try creating tasks with tags like `tasklite add \"task name\" -t tag1,tag2` !")
-                .unwrap();
-            println!("{}", tags);
+            let tags = task_manager.list_tags();
+            display_tags(tags)
         }
         SubCommands::Reset => {
             task_manager.reset_tasks()?;
@@ -123,6 +117,14 @@ fn parse_id(id: &str) -> TaskliteResult<usize> {
         .map_err(|_| format!("task with id {} not found", id).into())
 }
 
+fn print_tasks(tasks: &Vec<&Task>) {
+    let mut tasks = sort_tasks(tasks.to_owned());
+    tasks.reverse();
+    match tasks.is_empty() {
+        true => println!("No tasks found"),
+        false => display_tasks(tasks),
+    }
+}
 
 fn sort_tasks(tasks: Vec<&Task>) -> Vec<&Task> {
     let mut tasks = tasks.iter().collect::<Vec<_>>();
@@ -137,8 +139,8 @@ fn sort_tasks(tasks: Vec<&Task>) -> Vec<&Task> {
             .unwrap();
         a.done
             .cmp(&b.done)
-            .then(a_due_date.cmp(&b_due_date))
             .then(a.priority.cmp(&b.priority))
+            .then(b_due_date.cmp(&a_due_date))
     });
     tasks.iter().map(|task| **task).collect::<Vec<_>>()
 }

@@ -70,3 +70,16 @@ pub fn display_tasks(tasks: Vec<&Task>) {
     }
     table.printstd();
 }
+
+pub fn display_tags(tags: Vec<String>) {
+    let mut table = Table::new();
+    table.add_row(row![
+        "Tags".to_string().bold().bright_blue(),
+    ]);
+    tags.iter().for_each(|tag| {
+        table.add_row(row![
+            tag,
+        ]);
+    });
+    table.printstd();
+}

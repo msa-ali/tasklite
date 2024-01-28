@@ -2,7 +2,7 @@ use crate::{tasks::Task, AppData, TaskliteResult};
 use chrono::NaiveDate;
 
 pub struct TaskManager {
-    app_data: AppData,
+    pub app_data: AppData,
 }
 
 impl TaskManager {
