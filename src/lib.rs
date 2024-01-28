@@ -33,7 +33,7 @@ pub enum SubCommands {
         #[clap(short, long)]
         due_date: Option<String>,
         /// Tags for the task
-        #[clap(short, long)]
+        #[clap(short, long, value_delimiter = ',',  num_args = 1..)]
         tags: Option<Vec<String>>,
     },
     /// List tasks in the tasklist
@@ -47,7 +47,7 @@ pub enum SubCommands {
         due_before: Option<String>,
 
         /// List only tasks belonging to given tag(s)
-        #[clap(short, long)]
+        #[clap(short, long, value_delimiter = ',',  num_args = 1..)]
         tags: Option<Vec<String>>,
     },
     /// Mark a task as done

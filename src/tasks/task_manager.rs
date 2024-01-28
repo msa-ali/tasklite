@@ -24,7 +24,15 @@ impl TaskManager {
             tags,
             &self.app_data.config.date_format,
         )?;
-        println!("Adding task: {:?}", task);
+        self.app_data.next_id += 1;
+        if let Some(tags) = &task.tags {
+            for tag in tags {
+                let tag_tasks = self.app_data.tags.entry(tag.to_lowercase()).or_insert(vec![]);
+                tag_tasks.push(task.id);
+            }
+        }
+        self.app_data.tasks.insert(task.id, task);
+        self.app_data.save()?;
         Ok(())
     }
 }

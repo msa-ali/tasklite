@@ -1,6 +1,6 @@
 use dirs::home_dir;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::fs::{create_dir, File};
 use std::io::Write;
 use std::path::PathBuf;
@@ -9,7 +9,7 @@ use crate::{Task, TaskliteResult};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppData {
-    pub tasks: HashMap<usize, Task>,
+    pub tasks: BTreeMap<usize, Task>,
     pub tags: HashMap<String, Vec<usize>>,
     pub next_id: usize,
     pub config: AppConfig,
@@ -30,7 +30,7 @@ fn get_app_data_dir_path() -> PathBuf {
     path
 }
 
-pub fn get_app_data_file_path() -> PathBuf {
+fn get_app_data_file_path() -> PathBuf {
     let mut path = get_app_data_dir_path();
     path.push(DEFAULT_APP_DATA_FILE);
     path
@@ -49,7 +49,7 @@ impl AppData {
             println!("Creating file: {:?}", app_data_file);
             let mut file = File::create(app_data_file)?;
             let app_data = AppData {
-                tasks: HashMap::new(),
+                tasks: BTreeMap::new(),
                 tags: HashMap::new(),
                 next_id: 1,
                 config: AppConfig {
@@ -65,5 +65,13 @@ impl AppData {
             let app_data: AppData = serde_json::from_reader(file)?;
             Ok(app_data)
         }
+    }
+
+    pub fn save(&self) -> TaskliteResult<()> {
+        let app_data_file = get_app_data_file_path();
+        let mut file = File::create(app_data_file)?;
+        let json = serde_json::to_string(&self)?;
+        file.write_all(json.as_bytes())?;
+        Ok(())
     }
 }
