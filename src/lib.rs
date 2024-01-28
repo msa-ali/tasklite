@@ -91,12 +91,9 @@ pub fn run(config: SubCommands) -> TaskliteResult<()> {
             tags,
         } => {
             let tasks = task_manager.filter_tasks(priority, due_before, tags)?;
-            if tasks.is_empty() {
-                println!("No tasks found");
-            } else {
-                for task in tasks {
-                    println!("{}", task.id);
-                }
+            match tasks.is_empty() {
+                true => println!("No tasks found"),
+                false => display_tasks(sort_tasks(tasks)),
             }
         }
         SubCommands::Done { task_id } => {
@@ -124,4 +121,24 @@ pub fn run(config: SubCommands) -> TaskliteResult<()> {
 fn parse_id(id: &str) -> TaskliteResult<usize> {
     id.parse::<usize>()
         .map_err(|_| format!("task with id {} not found", id).into())
+}
+
+
+fn sort_tasks(tasks: Vec<&Task>) -> Vec<&Task> {
+    let mut tasks = tasks.iter().collect::<Vec<_>>();
+    tasks.sort_by(|a, b| {
+        let a_due_date = a
+            .get_parsed_due_date()
+            .or_else(|| chrono::NaiveDate::from_ymd_opt(9999, 12, 31))
+            .unwrap();
+        let b_due_date = b
+            .get_parsed_due_date()
+            .or_else(|| chrono::NaiveDate::from_ymd_opt(9999, 12, 31))
+            .unwrap();
+        a.done
+            .cmp(&b.done)
+            .then(a_due_date.cmp(&b_due_date))
+            .then(a.priority.cmp(&b.priority))
+    });
+    tasks.iter().map(|task| **task).collect::<Vec<_>>()
 }

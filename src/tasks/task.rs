@@ -43,6 +43,19 @@ impl Task {
         Ok(task)
     }
 
+    pub fn is_due_today(&self) -> bool {
+        self.is_due_before_given_date(&chrono::Local::now().date_naive())
+    }
+
+    pub fn get_parsed_due_date(&self) -> Option<NaiveDate> {
+        match &self.due_date {
+            Some(due_date) => Some(
+                NaiveDate::parse_from_str(due_date, DEFAULT_DATE_FORMAT).unwrap(),
+            ),
+            None => None,
+        }
+    }
+
     pub fn is_due_before_given_date(&self, given_due_date: &NaiveDate) -> bool {
         match &self.due_date {
             Some(due_date) => {
