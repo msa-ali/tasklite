@@ -5,7 +5,7 @@ use std::fs::{create_dir, File};
 use std::io::Write;
 use std::path::PathBuf;
 
-use crate::{Task, TaskliteResult};
+use crate::{Task, TodoResult};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppData {
@@ -20,9 +20,9 @@ pub struct AppConfig {
     pub date_format: String,
 }
 
-const DEFAULT_APP_DATA_FILE: &str = "tasklite.json";
+const DEFAULT_APP_DATA_FILE: &str = "todo.json";
 pub const DEFAULT_DATE_FORMAT: &str = "%d-%m-%Y";
-const DEFAULT_APP_DATA_DIRECTORY: &str = ".tasklite";
+const DEFAULT_APP_DATA_DIRECTORY: &str = ".msa_todo_rust";
 
 fn get_app_data_dir_path() -> PathBuf {
     let mut path = home_dir().unwrap();
@@ -37,7 +37,7 @@ fn get_app_data_file_path() -> PathBuf {
 }
 
 impl AppData {
-    pub fn init() -> TaskliteResult<Self> {
+    pub fn init() -> TodoResult<Self> {
         let app_directory = get_app_data_dir_path();
         if !app_directory.exists() {
             create_dir(app_directory)?;
@@ -63,7 +63,7 @@ impl AppData {
         }
     }
 
-    pub fn save(&self) -> TaskliteResult<()> {
+    pub fn save(&self) -> TodoResult<()> {
         let app_data_file = get_app_data_file_path();
         let mut file = File::create(app_data_file)?;
         let json = serde_json::to_string(&self)?;

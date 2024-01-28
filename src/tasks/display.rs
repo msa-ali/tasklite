@@ -1,5 +1,5 @@
 use colored::*;
-use prettytable::*;
+use prettytable::{row, Table};
 
 use crate::Task;
 
@@ -17,6 +17,7 @@ pub fn display_tasks(tasks: Vec<&Task>) {
         "Due Date".to_string().bold().bright_blue(),
         "tags".to_string().bold().bright_blue(),
         "Completed".to_string().bold().bright_blue(),
+        "Created On".to_string().bold().bright_blue(),
     ]);
     for task in tasks {
         let id = task.id.to_string();
@@ -30,10 +31,10 @@ pub fn display_tasks(tasks: Vec<&Task>) {
             Some(tags) => tags.join(", "),
             None => "-".to_string(),
         };
+        let created_at = task.created_at.to_owned();
         let mut row = row![
             id,
             description,
-            // priority,
             due_date,
             tags,
             completed
@@ -44,7 +45,8 @@ pub fn display_tasks(tasks: Vec<&Task>) {
                 description.green(),
                 due_date.green(),
                 tags.green(),
-                completed.green()
+                completed.green(),
+                created_at.green()
             ];
         } else {
             if task.priority {
@@ -53,7 +55,8 @@ pub fn display_tasks(tasks: Vec<&Task>) {
                     description.yellow(),
                     due_date.yellow(),
                     tags.yellow(),
-                    completed.yellow()
+                    completed.yellow(),
+                    created_at.yellow()
                 ];
             }
             if task.is_due_today() {
@@ -62,7 +65,8 @@ pub fn display_tasks(tasks: Vec<&Task>) {
                     description.red(),
                     due_date.red(),
                     tags.red(),
-                    completed.red()
+                    completed.red(),
+                    created_at.red()
                 ];
             }
         }

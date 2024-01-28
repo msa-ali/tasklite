@@ -1,4 +1,4 @@
-use crate::TaskliteResult;
+use crate::TodoResult;
 use crate::app::DEFAULT_DATE_FORMAT;
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
@@ -22,7 +22,7 @@ impl Task {
         due_date: Option<String>,
         tags: Option<Vec<String>>,
         date_format: &str,
-    ) -> TaskliteResult<Self> {
+    ) -> TodoResult<Self> {
         let due_date = match due_date {
             Some(due_date) => Some(
                 Task::parse_due_date(&due_date, date_format)?.format(DEFAULT_DATE_FORMAT).to_string(),
@@ -66,7 +66,7 @@ impl Task {
         }
     }
 
-    fn parse_due_date(due_date: &str, date_format: &str) -> TaskliteResult<NaiveDate> {
+    fn parse_due_date(due_date: &str, date_format: &str) -> TodoResult<NaiveDate> {
         match NaiveDate::parse_from_str(due_date, date_format) {
             Ok(date) => Ok(date),
             Err(_) => Err(format!("Invalid due date. Date should be in this format: {}", date_format).into()),

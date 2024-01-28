@@ -10,10 +10,10 @@ pub use tasks::*;
 
 #[derive(Parser)]
 #[clap(
-    name = "tasklite",
+    name = "todo",
     version = "0.1.0",
-    author = "Md Sultan Altamash Ali",
-    about = "A simple tasklist app written in Rust"
+    author = "Md Sultan Altamash Ali <altamashattari786@gmail.com>",
+    about = "A simple todo app written in Rust. For more information, visit github.com/msa-ali/todo-rust"
 )]
 pub struct Cli {
     #[clap(subcommand)]
@@ -22,7 +22,7 @@ pub struct Cli {
 
 #[derive(Parser, Debug)]
 pub enum SubCommands {
-    /// Add a task to the tasklist
+    /// Add a task to the todo list
     Add {
         /// Name of the task
         name: String,
@@ -36,7 +36,7 @@ pub enum SubCommands {
         #[clap(short, long, value_delimiter = ',',  num_args = 1..)]
         tags: Option<Vec<String>>,
     },
-    /// List tasks in the tasklist
+    /// List tasks in the todo list
     List {
         /// List only high priority tasks
         #[clap(short, long)]
@@ -55,25 +55,25 @@ pub enum SubCommands {
         /// ID of the task to mark as done
         task_id: String,
     },
-    /// Remove a task from the tasklist
+    /// Remove a task from the todo list
     Remove {
         /// ID of the task to remove
         task_id: String,
     },
     /// List all existing tags
     Tags,
-    /// Reset the tasklist
+    /// Reset the todo list
     Reset,
 }
 
-pub type TaskliteResult<T> = Result<T, Box<dyn Error>>;
+pub type TodoResult<T> = Result<T, Box<dyn Error>>;
 
-pub fn get_args() -> TaskliteResult<SubCommands> {
+pub fn get_args() -> TodoResult<SubCommands> {
     let subcmd = Cli::parse().subcmd;
     subcmd.ok_or("error while parsing subcommands".into())
 }
 
-pub fn run(config: SubCommands) -> TaskliteResult<()> {
+pub fn run(config: SubCommands) -> TodoResult<()> {
     let app_data = AppData::init()?;
     let mut task_manager = task_manager::TaskManager::new(app_data);
     match config {
@@ -97,9 +97,13 @@ pub fn run(config: SubCommands) -> TaskliteResult<()> {
         }
         SubCommands::Done { task_id } => {
             task_manager.mark_done(parse_id(&task_id)?)?;
+            let tasks: Vec<&Task> = task_manager.app_data.tasks.values().map(|x| x).collect::<Vec<_>>();
+            print_tasks(&tasks);
         }
         SubCommands::Remove { task_id } => {
             task_manager.remove_task(parse_id(&task_id)?)?;
+            let tasks: Vec<&Task> = task_manager.app_data.tasks.values().map(|x| x).collect::<Vec<_>>();
+            print_tasks(&tasks);
         }
         SubCommands::Tags => {
             let tags = task_manager.list_tags();
@@ -112,7 +116,7 @@ pub fn run(config: SubCommands) -> TaskliteResult<()> {
     Ok(())
 }
 
-fn parse_id(id: &str) -> TaskliteResult<usize> {
+fn parse_id(id: &str) -> TodoResult<usize> {
     id.parse::<usize>()
         .map_err(|_| format!("task with id {} not found", id).into())
 }

@@ -1,4 +1,4 @@
-use crate::{tasks::Task, AppData, TaskliteResult};
+use crate::{tasks::Task, AppData, TodoResult};
 use chrono::NaiveDate;
 
 pub struct TaskManager {
@@ -16,7 +16,7 @@ impl TaskManager {
         priority: bool,
         due_date: Option<String>,
         tags: Option<Vec<String>>,
-    ) -> TaskliteResult<()> {
+    ) -> TodoResult<()> {
         let task = Task::new(
             self.app_data.next_id,
             name,
@@ -41,7 +41,7 @@ impl TaskManager {
         Ok(())
     }
 
-    pub fn remove_task(&mut self, id: usize) -> TaskliteResult<()> {
+    pub fn remove_task(&mut self, id: usize) -> TodoResult<()> {
         match self.app_data.tasks.remove(&id) {
             Some(task) => {
                 if let Some(tags) = &task.tags {
@@ -60,7 +60,7 @@ impl TaskManager {
         }
     }
 
-    pub fn reset_tasks(&mut self) -> TaskliteResult<()> {
+    pub fn reset_tasks(&mut self) -> TodoResult<()> {
         self.app_data.tasks.clear();
         self.app_data.tags.clear();
         self.app_data.next_id = 1;
@@ -68,7 +68,7 @@ impl TaskManager {
         Ok(())
     }
 
-    pub fn mark_done(&mut self, id: usize) -> TaskliteResult<()> {
+    pub fn mark_done(&mut self, id: usize) -> TodoResult<()> {
         match self.app_data.tasks.get_mut(&id) {
             Some(task) => {
                 task.done = true;
@@ -102,7 +102,7 @@ impl TaskManager {
         priority: bool,
         due_date: Option<String>,
         tags: Option<Vec<String>>,
-    ) -> TaskliteResult<Vec<&Task>> {
+    ) -> TodoResult<Vec<&Task>> {
         let due_date = match due_date {
             Some(due_date) => Some(
                 NaiveDate::parse_from_str(&due_date, &self.app_data.config.date_format)

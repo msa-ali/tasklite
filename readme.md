@@ -1,15 +1,15 @@
-# Tasklite
+# todo
 
-Tasklite is a simple command line task manager written in Rust.
+todo is a simple command line todo application written in Rust. It provides a simple interface to manage your tasks. Tasks can be added, listed, marked as done and removed. Tasks can also be tagged and filtered by priority, due date and tags.
 
 ## Usage
 
 ### Commands
 
-- `add`     Add a task to the tasklist
-- `list`    List tasks in the tasklist
+- `add`     Add a task to the todo list
+- `list`    List tasks in the todo list
 - `done`    Mark a task as done
-- `remove`  Remove a task from the tasklist
+- `remove`  Remove a task from the todo list
 - `help`    Print this message or the help of the given subcommand(s)
 
 ### Options
@@ -19,9 +19,9 @@ Tasklite is a simple command line task manager written in Rust.
 
 ### `add`
 
-Add a task to the tasklist
+Add a task to the todo list
 
-Usage: `tasklite add [OPTIONS] <NAME>`
+Usage: `todo add [OPTIONS] <NAME>`
 
 Arguments:
 
@@ -36,14 +36,14 @@ Options:
 
 Example:
 
-- `tasklite add "Buy milk" -t groceries`
-- `tasklite add "Complete code review" -p -d "28-01-2024 12:00:00" -t work`
+- `todo add "Buy milk" -t groceries`
+- `todo add "Complete code review" -p -d "28-01-2024 12:00:00" -t work`
 
 ### `list`
 
-List tasks in the tasklist
+List tasks in the todo list
 
-Usage: `tasklite list [OPTIONS]`
+Usage: `todo list [OPTIONS]`
 
 Options:
 
@@ -54,15 +54,15 @@ Options:
 
 Example:
 
-- `tasklite list`
-- `tasklite list -p`
-- `tasklite list -d "20-12-2020 12:00:00" -t work`
+- `todo list`
+- `todo list -p`
+- `todo list -d "20-12-2020 12:00:00" -t work`
 
 ### `done`
 
 Mark a task as done
 
-Usage: `tasklite done <TASK_ID>`
+Usage: `todo done <TASK_ID>`
 
 Arguments:
 
@@ -74,13 +74,13 @@ Options:
 
 Example:
 
-- `tasklite done 1`
+- `todo done 1`
 
 ### `remove`
 
-Remove a task from the tasklist
+Remove a task from the todo list
 
-Usage: `tasklite remove <TASK_ID>`
+Usage: `todo remove <TASK_ID>`
 
 Arguments:
 
@@ -92,16 +92,16 @@ Options:
 
 Example:
 
-- `tasklite remove 1`
+- `todo remove 1`
 
 ### tags
 
-List all tags in the tasklist
+List all tags in the todo list
 
-Usage: `tasklite tags`
+Usage: `todo tags`
 
 ### reset
 
-Reset the tasklist
+Reset the todo list
 
-Usage: `tasklite reset`
+Usage: `todo reset`
