@@ -1,11 +1,12 @@
-use std::error::Error;
+pub use crate::tasks::task_manager;
 use clap::Parser;
+use std::error::Error; // Import the task_manager module
 
-mod tasks;
 mod app;
+mod tasks;
 
-pub use tasks::*;
 pub use app::*;
+pub use tasks::*;
 
 #[derive(Parser)]
 #[clap(
@@ -72,28 +73,35 @@ pub fn get_args() -> TaskliteResult<SubCommands> {
 
 pub fn run(config: SubCommands) -> TaskliteResult<()> {
     println!("{:?}", config);
-    // match config {
-    //     SubCommands::Add {
-    //         name,
-    //         priority,
-    //         due_date,
-    //     } => {
-    //         let task = tasklite::Task::new(name, priority, due_date);
-    //         tasklite::add_task(task)?;
-    //     }
-    //     SubCommands::List { priority } => {
-    //         let tasks = tasklite::get_tasks()?;
-    //         tasklite::list_tasks(tasks, priority);
-    //     }
-    //     SubCommands::Done { task_id } => {
-    //         tasklite::mark_done(task_id)?;
-    //     }
-    //     SubCommands::Remove { task_id } => {
-    //         tasklite::remove_task(task_id)?;
-    //     }
-    // }
     let app_data = AppData::init()?;
     println!("{:?}", app_data);
+    let mut task_manager = task_manager::TaskManager::new(app_data);
+    match config {
+        SubCommands::Add {
+            name,
+            priority,
+            due_date,
+            tags,
+        } => {
+            println!("add task");
+            task_manager.add_task(name, priority, due_date, tags)?;
+        }
+        SubCommands::List {
+            priority,
+            due_before,
+            tags,
+        } => {
+            // app_data.list_tasks(priority, due_before, tags)?;
+        }
+        SubCommands::Done { task_id } => {
+            // app_data.mark_done(task_id)?;
+        }
+        SubCommands::Remove { task_id } => {
+            // app_data.remove_task(task_id)?;
+        }
+        SubCommands::Tags => {
+            // app_data.list_tags()?;
+        }
+    }
     Ok(())
 }
-

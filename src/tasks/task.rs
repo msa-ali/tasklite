@@ -1,3 +1,5 @@
+use crate::TaskliteResult;
+use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -18,15 +20,30 @@ impl Task {
         priority: bool,
         due_date: Option<String>,
         tags: Option<Vec<String>>,
-    ) -> Self {
-        Task {
+        date_format: &str,
+    ) -> TaskliteResult<Self> {
+        let due_date = match due_date {
+            Some(due_date) => Some(Task::parse_due_date(&due_date, date_format)?.to_string()),
+            None => None,
+        };
+        let task = Task {
             id,
             name,
             priority,
             due_date,
             tags,
             done: false,
-            created_at: chrono::Local::now().to_string(),
+            created_at: chrono::Local::now()
+                .format(&format!("{} %H:%M:%S", date_format))
+                .to_string(),
+        };
+        Ok(task)
+    }
+
+    fn parse_due_date(due_date: &str, date_format: &str) -> TaskliteResult<NaiveDate> {
+        match NaiveDate::parse_from_str(due_date, date_format) {
+            Ok(date) => Ok(date),
+            Err(_) => Err("Invalid due date".into()),
         }
     }
 }

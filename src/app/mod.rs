@@ -21,31 +21,32 @@ pub struct AppConfig {
 }
 
 const DEFAULT_APP_DATA_FILE: &str = "tasklite.json";
-const DEFAULT_DATE_FORMAT: &str = "%d-%m-%Y %H:%M:%S";
+const DEFAULT_DATE_FORMAT: &str = "%d-%m-%Y";
 const DEFAULT_APP_DATA_DIRECTORY: &str = ".tasklite";
 
-fn get_app_data_directory() -> PathBuf {
+fn get_app_data_dir_path() -> PathBuf {
     let mut path = home_dir().unwrap();
     path.push(DEFAULT_APP_DATA_DIRECTORY);
     path
 }
 
-fn get_app_data_file() -> PathBuf {
-    let mut path = get_app_data_directory();
+pub fn get_app_data_file_path() -> PathBuf {
+    let mut path = get_app_data_dir_path();
     path.push(DEFAULT_APP_DATA_FILE);
     path
 }
 
 impl AppData {
     pub fn init() -> TaskliteResult<Self> {
-        // read user's home/.tasklite/tasklite.json
-        let app_directory = get_app_data_directory();
+        println!("Initializing app data...");
+        let app_directory = get_app_data_dir_path();
         if !app_directory.exists() {
+            println!("Creating directory: {:?}", app_directory);
             create_dir(app_directory)?;
         }
-        let app_data_file = get_app_data_file();
-        // if file doesn't exist, create it
+        let app_data_file = get_app_data_file_path();
         if !app_data_file.exists() {
+            println!("Creating file: {:?}", app_data_file);
             let mut file = File::create(app_data_file)?;
             let app_data = AppData {
                 tasks: HashMap::new(),
@@ -59,6 +60,7 @@ impl AppData {
             file.write_all(json.as_bytes())?;
             Ok(app_data)
         } else {
+            println!("App is already initialized..");
             let file = File::open(app_data_file)?;
             let app_data: AppData = serde_json::from_reader(file)?;
             Ok(app_data)
