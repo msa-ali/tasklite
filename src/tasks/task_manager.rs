@@ -41,6 +41,42 @@ impl TaskManager {
         Ok(())
     }
 
+    pub fn edit_task(
+        &mut self,
+        id: usize,
+        name: Option<String>,
+        priority: Option<bool>,
+        due_date: Option<String>,
+        tags: Option<Vec<String>>,
+        done: Option<bool>,
+    ) -> TodoResult<()> {
+        match self.app_data.tasks.get_mut(&id) {
+            Some(task) => {
+                task.edit(
+                    name,
+                    priority,
+                    due_date,
+                    tags,
+                    done,
+                    &self.app_data.config.date_format,
+                )?;
+                if let Some(tags) = &task.tags {
+                    for tag in tags {
+                        let tag_tasks = self
+                            .app_data
+                            .tags
+                            .entry(tag.to_lowercase())
+                            .or_insert(vec![]);
+                        tag_tasks.push(task.id);
+                    }
+                }
+                self.app_data.save()?;
+                Ok(())
+            },
+            None => return Err(format!("task with id {} not found", id).into()),
+        }
+    }
+
     pub fn remove_task(&mut self, id: usize) -> TodoResult<()> {
         match self.app_data.tasks.remove(&id) {
             Some(task) => {

@@ -12,6 +12,7 @@ pub struct Task {
     pub tags: Option<Vec<String>>,
     pub done: bool,
     pub created_at: String,
+    pub updated_at: Option<String>,
 }
 
 impl Task {
@@ -39,8 +40,43 @@ impl Task {
             created_at: chrono::Local::now()
                 .format(&format!("{} %H:%M:%S", DEFAULT_DATE_FORMAT))
                 .to_string(),
+            updated_at: None,
         };
         Ok(task)
+    }
+
+    pub fn edit(
+        &mut self,
+        name: Option<String>,
+        priority: Option<bool>,
+        due_date: Option<String>,
+        tags: Option<Vec<String>>,
+        done: Option<bool>,
+        date_format: &str,
+    ) -> TodoResult<()> {
+        if let Some(name) = name {
+            self.name = name;
+        }
+        if let Some(priority) = priority {
+            self.priority = priority;
+        }
+        if let Some(due_date) = due_date {
+            self.due_date = Some(
+                Task::parse_due_date(&due_date, date_format)?.format(DEFAULT_DATE_FORMAT).to_string(),
+            );
+        }
+        if let Some(tags) = tags {
+            self.tags = Some(tags);
+        }
+        if let Some(done) = done {
+            self.done = done;
+        }
+        self.updated_at = Some(
+            chrono::Local::now()
+                .format(&format!("{} %H:%M:%S", DEFAULT_DATE_FORMAT))
+                .to_string(),
+        );
+        Ok(())
     }
 
     pub fn is_due_today(&self) -> bool {

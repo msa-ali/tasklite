@@ -46,6 +46,30 @@ Example:
 - `todo add "Buy milk" -t groceries`
 - `todo add "Complete code review" -p -d "28-01-2024 12:00:00" -t work`
 
+### `edit`
+
+Edit a task in the todo list
+
+Usage: `todo edit [OPTIONS] <TASK_ID>`
+
+Arguments:
+
+- `<TASK_ID>`  ID of the task to edit
+
+Options:
+
+- `-n, --name <NAME>`                       Update name
+- `-p, --priority <PRIORITY>`               Mark the task as high priority
+- `-d, --due-date <DUE_DATE>`               Update due date (format: DD-MM-YYYY HH:MM:SS)
+- `-t, --tags <TAGS>...`                    Update tags (format: tag1,tag2,tag3)
+- `-c, --complete <COMPLETE>`               Update completion status [possible values: true, false]
+- `-h, --help`                              Print help
+
+Example:
+
+- `todo edit 1 -n "Buy milk and eggs" -t groceries`
+- `todo edit 1 -p false -d "28-01-2024 12:00:00" -t work`
+
 ### `list`
 
 List tasks in the todo list

@@ -36,6 +36,26 @@ pub enum SubCommands {
         #[clap(short, long, value_delimiter = ',',  num_args = 1..)]
         tags: Option<Vec<String>>,
     },
+    /// Edit a task in the todo list
+    Edit {
+        /// ID of the task to edit
+        task_id: String,
+        /// Update name
+        #[clap(short, long)]
+        name: Option<String>,
+        /// Update priority
+        #[clap(short, long)]
+        priority: Option<bool>,
+        /// Update due date (format: DD-MM-YYYY)
+        #[clap(short, long)]
+        due_date: Option<String>,
+        /// Update tags
+        #[clap(short, long, value_delimiter = ',',  num_args = 1..)]
+        tags: Option<Vec<String>>,
+        /// Update completion status
+        #[clap(short, long)]
+        complete: Option<bool>,
+    },
     /// List tasks in the todo list
     List {
         /// List only high priority tasks
@@ -69,8 +89,11 @@ pub enum SubCommands {
 pub type TodoResult<T> = Result<T, Box<dyn Error>>;
 
 pub fn get_args() -> TodoResult<SubCommands> {
-    let subcmd = Cli::parse().subcmd;
-    subcmd.ok_or("error while parsing subcommands".into())
+    Ok(Cli::parse().subcmd.unwrap_or_else(|| SubCommands::List {
+        priority: false,
+        due_before: None,
+        tags: None,
+    }))
 }
 
 pub fn run(config: SubCommands) -> TodoResult<()> {
@@ -84,7 +107,36 @@ pub fn run(config: SubCommands) -> TodoResult<()> {
             tags,
         } => {
             task_manager.add_task(name, priority, due_date, tags)?;
-            let tasks: Vec<&Task> = task_manager.app_data.tasks.values().map(|x| x).collect::<Vec<_>>();
+            let tasks: Vec<&Task> = task_manager
+                .app_data
+                .tasks
+                .values()
+                .map(|x| x)
+                .collect::<Vec<_>>();
+            print_tasks(&tasks);
+        }
+        SubCommands::Edit {
+            task_id,
+            name,
+            priority,
+            due_date,
+            tags,
+            complete,
+        } => {
+            task_manager.edit_task(
+                parse_id(&task_id)?,
+                name,
+                priority,
+                due_date,
+                tags,
+                complete,
+            )?;
+            let tasks: Vec<&Task> = task_manager
+                .app_data
+                .tasks
+                .values()
+                .map(|x| x)
+                .collect::<Vec<_>>();
             print_tasks(&tasks);
         }
         SubCommands::List {
@@ -97,12 +149,22 @@ pub fn run(config: SubCommands) -> TodoResult<()> {
         }
         SubCommands::Done { task_id } => {
             task_manager.mark_done(parse_id(&task_id)?)?;
-            let tasks: Vec<&Task> = task_manager.app_data.tasks.values().map(|x| x).collect::<Vec<_>>();
+            let tasks: Vec<&Task> = task_manager
+                .app_data
+                .tasks
+                .values()
+                .map(|x| x)
+                .collect::<Vec<_>>();
             print_tasks(&tasks);
         }
         SubCommands::Remove { task_id } => {
             task_manager.remove_task(parse_id(&task_id)?)?;
-            let tasks: Vec<&Task> = task_manager.app_data.tasks.values().map(|x| x).collect::<Vec<_>>();
+            let tasks: Vec<&Task> = task_manager
+                .app_data
+                .tasks
+                .values()
+                .map(|x| x)
+                .collect::<Vec<_>>();
             print_tasks(&tasks);
         }
         SubCommands::Tags => {

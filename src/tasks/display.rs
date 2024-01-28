@@ -5,10 +5,10 @@ use crate::Task;
 
 /// Display given tasks in tabular format
 pub fn display_tasks(tasks: Vec<&Task>) {
-    println!("{}", "Legend:".bold().bright_cyan().underline());
-    println!("{}: {}", "Yellow".yellow(), "Priority task");
-    println!("{}: {}", "Red".red(), "Due today");
-    println!("{}: {}", "Green".green(), "Completed");
+    print!("\n{}\t", "Legend:".bold().bright_cyan());
+    print!("{}\t", "Priority task".underline().yellow());
+    print!("{}\t", "Due today".underline().red());
+    println!("{}\t", "Completed".underline().green());
     println!("");
     let mut table = Table::new();
     table.add_row(row![
@@ -18,11 +18,16 @@ pub fn display_tasks(tasks: Vec<&Task>) {
         "tags".to_string().bold().bright_blue(),
         "Completed".to_string().bold().bright_blue(),
         "Created On".to_string().bold().bright_blue(),
+        "Last Updated".to_string().bold().bright_blue(),
     ]);
     for task in tasks {
         let id = task.id.to_string();
         let description = task.name.to_string();
         let due_date = match &task.due_date {
+            Some(date) => date.to_string(),
+            None => "-".to_string(),
+        };
+        let last_updated = match &task.updated_at {
             Some(date) => date.to_string(),
             None => "-".to_string(),
         };
@@ -39,6 +44,7 @@ pub fn display_tasks(tasks: Vec<&Task>) {
             tags,
             completed,
             created_at,
+            last_updated
         ];
         if task.done {
             row = row![
@@ -47,7 +53,8 @@ pub fn display_tasks(tasks: Vec<&Task>) {
                 due_date.green(),
                 tags.green(),
                 completed.green(),
-                created_at.green()
+                created_at.green(),
+                last_updated.green(),
             ];
         } else {
             if task.priority {
@@ -57,7 +64,8 @@ pub fn display_tasks(tasks: Vec<&Task>) {
                     due_date.yellow(),
                     tags.yellow(),
                     completed.yellow(),
-                    created_at.yellow()
+                    created_at.yellow(),
+                    last_updated.yellow(),
                 ];
             }
             if task.is_due_today() {
@@ -67,7 +75,8 @@ pub fn display_tasks(tasks: Vec<&Task>) {
                     due_date.red(),
                     tags.red(),
                     completed.red(),
-                    created_at.red()
+                    created_at.red(),
+                    last_updated.red(),
                 ];
             }
         }
