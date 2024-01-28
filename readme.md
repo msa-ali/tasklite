@@ -93,3 +93,15 @@ Options:
 Example:
 
 - `tasklite remove 1`
+
+### tags
+
+List all tags in the tasklist
+
+Usage: `tasklite tags`
+
+### reset
+
+Reset the tasklist
+
+Usage: `tasklite reset`

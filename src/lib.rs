@@ -62,6 +62,8 @@ pub enum SubCommands {
     },
     /// List all tags
     Tags,
+    /// Reset the tasklist
+    Reset,
 }
 
 pub type TaskliteResult<T> = Result<T, Box<dyn Error>>;
@@ -94,14 +96,22 @@ pub fn run(config: SubCommands) -> TaskliteResult<()> {
             // app_data.list_tasks(priority, due_before, tags)?;
         }
         SubCommands::Done { task_id } => {
-            // app_data.mark_done(task_id)?;
+            task_manager.mark_done(parse_id(&task_id)?)?;
         }
         SubCommands::Remove { task_id } => {
-            // app_data.remove_task(task_id)?;
+            task_manager.remove_task(parse_id(&task_id)?)?;
         }
         SubCommands::Tags => {
-            // app_data.list_tags()?;
+            let tags = task_manager.list_tags().join(", ");
+            println!("{}", tags);
+        }
+        SubCommands::Reset => {
+            task_manager.reset_tasks()?;
         }
     }
     Ok(())
+}
+
+fn parse_id(id: &str) -> TaskliteResult<usize> {
+    id.parse::<usize>().map_err(|_| format!("task with id {} not found", id).into())
 }
