@@ -1,4 +1,5 @@
 use crate::TaskliteResult;
+use crate::app::DEFAULT_DATE_FORMAT;
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
@@ -23,7 +24,9 @@ impl Task {
         date_format: &str,
     ) -> TaskliteResult<Self> {
         let due_date = match due_date {
-            Some(due_date) => Some(Task::parse_due_date(&due_date, date_format)?.to_string()),
+            Some(due_date) => Some(
+                Task::parse_due_date(&due_date, date_format)?.format(DEFAULT_DATE_FORMAT).to_string(),
+            ),
             None => None,
         };
         let task = Task {
@@ -34,16 +37,26 @@ impl Task {
             tags,
             done: false,
             created_at: chrono::Local::now()
-                .format(&format!("{} %H:%M:%S", date_format))
+                .format(&format!("{} %H:%M:%S", DEFAULT_DATE_FORMAT))
                 .to_string(),
         };
         Ok(task)
     }
 
+    pub fn is_due_before_given_date(&self, given_due_date: &NaiveDate) -> bool {
+        match &self.due_date {
+            Some(due_date) => {
+                let due_date = NaiveDate::parse_from_str(due_date, DEFAULT_DATE_FORMAT).unwrap();
+                due_date <= *given_due_date
+            }
+            None => false,
+        }
+    }
+
     fn parse_due_date(due_date: &str, date_format: &str) -> TaskliteResult<NaiveDate> {
         match NaiveDate::parse_from_str(due_date, date_format) {
             Ok(date) => Ok(date),
-            Err(_) => Err("Invalid due date".into()),
+            Err(_) => Err(format!("Invalid due date. Date should be in this format: {}", date_format).into()),
         }
     }
 }

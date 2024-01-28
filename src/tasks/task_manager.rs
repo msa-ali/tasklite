@@ -1,4 +1,5 @@
 use crate::{tasks::Task, AppData, TaskliteResult};
+use chrono::NaiveDate;
 
 pub struct TaskManager {
     app_data: AppData,
@@ -27,7 +28,11 @@ impl TaskManager {
         self.app_data.next_id += 1;
         if let Some(tags) = &task.tags {
             for tag in tags {
-                let tag_tasks = self.app_data.tags.entry(tag.to_lowercase()).or_insert(vec![]);
+                let tag_tasks = self
+                    .app_data
+                    .tags
+                    .entry(tag.to_lowercase())
+                    .or_insert(vec![]);
                 tag_tasks.push(task.id);
             }
         }
@@ -90,5 +95,56 @@ impl TaskManager {
 
     pub fn list_tags(&self) -> Vec<String> {
         self.app_data.tags.keys().cloned().collect()
+    }
+
+    pub fn filter_tasks(
+        &self,
+        priority: bool,
+        due_date: Option<String>,
+        tags: Option<Vec<String>>,
+    ) -> TaskliteResult<Vec<&Task>> {
+        let due_date = match due_date {
+            Some(due_date) => Some(
+                NaiveDate::parse_from_str(&due_date, &self.app_data.config.date_format)
+                    .map_err(|_| "Invalid due date")?
+            ),
+            None => None,
+        };
+        let filtered_tasks = self.app_data
+            .tasks
+            .values()
+            .filter(|task| {
+                // filter by priority
+                if priority && !task.priority {
+                    return false;
+                }
+                // filter by due date
+                if let Some(given_due_date) = &due_date {
+                    if task.due_date.is_none() {
+                        return false;
+                    }
+                    if !task.is_due_before_given_date(given_due_date) {
+                        return false;
+                    }
+                }
+                if let Some(given_tags) = &tags {
+                    if self.app_data.tags.is_empty() {
+                        return false;
+                    }
+                    let available_tags = self.app_data.tags.keys().collect::<Vec<&String>>();
+                    // if any of the given tags is not available, return false
+                    for tag in given_tags {
+                        if !available_tags.contains(&tag) {
+                            return false;
+                        }
+                        let entry = self.app_data.tags.get(tag).unwrap();
+                        if entry.is_empty() || !entry.contains(&task.id) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }).map(|task| task).collect::<Vec<&Task>>();
+        Ok(filtered_tasks)
     }
 }

@@ -21,7 +21,7 @@ pub struct AppConfig {
 }
 
 const DEFAULT_APP_DATA_FILE: &str = "tasklite.json";
-const DEFAULT_DATE_FORMAT: &str = "%d-%m-%Y";
+pub const DEFAULT_DATE_FORMAT: &str = "%d-%m-%Y";
 const DEFAULT_APP_DATA_DIRECTORY: &str = ".tasklite";
 
 fn get_app_data_dir_path() -> PathBuf {

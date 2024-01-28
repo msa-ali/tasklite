@@ -90,7 +90,14 @@ pub fn run(config: SubCommands) -> TaskliteResult<()> {
             due_before,
             tags,
         } => {
-            // app_data.list_tasks(priority, due_before, tags)?;
+            let tasks = task_manager.filter_tasks(priority, due_before, tags)?;
+            if tasks.is_empty() {
+                println!("No tasks found");
+            } else {
+                for task in tasks {
+                    println!("{}", task.id);
+                }
+            }
         }
         SubCommands::Done { task_id } => {
             task_manager.mark_done(parse_id(&task_id)?)?;
