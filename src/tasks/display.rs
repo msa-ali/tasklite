@@ -37,7 +37,8 @@ pub fn display_tasks(tasks: Vec<&Task>) {
             description,
             due_date,
             tags,
-            completed
+            completed,
+            created_at,
         ];
         if task.done {
             row = row![
