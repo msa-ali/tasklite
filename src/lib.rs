@@ -11,7 +11,7 @@ pub use tasks::*;
 #[derive(Parser)]
 #[clap(
     name = "todo",
-    version = "0.1.0",
+    version = "0.2.0",
     author = "Md Sultan Altamash Ali <altamashattari786@gmail.com>",
     about = "A simple todo app written in Rust. For more information, visit github.com/msa-ali/todo-rust"
 )]

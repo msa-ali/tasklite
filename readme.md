@@ -1,6 +1,6 @@
 # todo-rust
 
-todo is a open-source simple command line todo application written in Rust. It provides a simple interface to manage your tasks. Tasks can be added, listed, marked as done and removed. Tasks can also be tagged and filtered by priority, due date and tags.
+todo is a simple command line todo application written in Rust. It provides a simple interface to manage your tasks. Tasks can be added, edited, listed, marked as done and removed. Tasks can also be tagged and filtered by priority, due date and tags.
 
 ## Installation
 
