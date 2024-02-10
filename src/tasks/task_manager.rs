@@ -138,6 +138,8 @@ impl TaskManager {
         priority: bool,
         due_date: Option<String>,
         tags: Option<Vec<String>>,
+        done: bool,
+        show_all: bool,
     ) -> TodoResult<Vec<&Task>> {
         let due_date = match due_date {
             Some(due_date) => Some(
@@ -150,6 +152,13 @@ impl TaskManager {
             .tasks
             .values()
             .filter(|task| {
+                if show_all {
+                    return true
+                }
+                // filter by done
+                if (done && !task.done) || (!done && task.done){
+                    return false;
+                }
                 // filter by priority
                 if priority && !task.priority {
                     return false;

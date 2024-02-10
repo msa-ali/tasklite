@@ -56,7 +56,7 @@ pub enum SubCommands {
         #[clap(short, long)]
         complete: Option<bool>,
     },
-    /// List tasks in the todo list
+    /// List tasks in the todo list, by default it won't list completed tasks
     List {
         /// List only high priority tasks
         #[clap(short, long)]
@@ -69,6 +69,14 @@ pub enum SubCommands {
         /// List only tasks belonging to given tag(s)
         #[clap(short, long, value_delimiter = ',',  num_args = 1..)]
         tags: Option<Vec<String>>,
+
+        /// List only tasks that are done
+        #[clap(long)]
+        done: bool,
+
+        /// List all tasks, conflicts with all other filters
+        #[clap(long, conflicts_with_all = &["priority", "due_before", "tags", "done"])]
+        all: bool,
     },
     /// Mark a task as done
     Done {
@@ -93,6 +101,8 @@ pub fn get_args() -> TodoResult<SubCommands> {
         priority: false,
         due_before: None,
         tags: None,
+        done: false,
+        all: false,
     }))
 }
 
@@ -143,8 +153,10 @@ pub fn run(config: SubCommands) -> TodoResult<()> {
             priority,
             due_before,
             tags,
+            done,
+            all
         } => {
-            let tasks = task_manager.filter_tasks(priority, due_before, tags)?;
+            let tasks = task_manager.filter_tasks(priority, due_before, tags, done, all)?;
             print_tasks(&tasks);
         }
         SubCommands::Done { task_id } => {
@@ -203,9 +215,8 @@ fn sort_tasks(tasks: Vec<&Task>) -> Vec<&Task> {
             .get_parsed_due_date()
             .or_else(|| chrono::NaiveDate::from_ymd_opt(9999, 12, 31))
             .unwrap();
-        a.done
-            .cmp(&b.done)
-            .then(a.priority.cmp(&b.priority))
+        a.priority
+            .cmp(&b.priority)
             .then(b_due_date.cmp(&a_due_date))
     });
     tasks.iter().map(|task| **task).collect::<Vec<_>>()
